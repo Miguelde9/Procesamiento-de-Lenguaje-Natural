@@ -1,6 +1,6 @@
 ✅ Requisitos previos
 - Tener Python 3.8 o superior instalado.
-- Tener Git instalado.
+- Tener Django instalado.
 
 * Instrucciones
 - abrir simbolo del sistema
