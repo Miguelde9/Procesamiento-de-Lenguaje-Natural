@@ -1,9 +1,10 @@
 import re
 from collections import Counter
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from .forms import TextoAnalizadoForm
 from .models import TextoAnalizado
-from .utils import procesar_texto  # Importar la nueva función de utilidades
+from .utils import procesar_texto, limpiar_texto  # Importar ambas funciones
 
 def subir_texto(request):
     if request.method == 'POST':
@@ -32,8 +33,49 @@ def analizar_texto(request, texto_id):
     # Procesar el texto usando la nueva funcionalidad de limpieza
     resultado = procesar_texto(contenido)
     
+    # Guardar el contenido original y procesado en la sesión para mostrarlo después
+    request.session['texto_original'] = contenido
+    request.session['texto_procesado'] = ' '.join(resultado['palabras_limpias'])
+    
     return render(request, 'resultado.html', {
         'texto': texto_obj,
         'palabras_comunes': resultado['palabras_comunes'],
-        'total_palabras': resultado['total_palabras']
+        'total_palabras': resultado['total_palabras'],
+        'texto_id': texto_id
+    })
+
+def ver_procesamiento(request, texto_id):
+    """Vista para mostrar los detalles del procesamiento aplicado"""
+    texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
+    
+    # Leer el contenido del archivo
+    try:
+        with texto_obj.archivo.open('r') as archivo:
+            contenido = archivo.read()
+    except:
+        contenido = ""
+    
+    # Obtener el texto original y procesado
+    texto_original = contenido
+    palabras_limpias = limpiar_texto(contenido)
+    texto_procesado = ' '.join(palabras_limpias)
+    
+    # Contar estadísticas
+    palabras_originales = texto_original.split()
+    stopwords_eliminadas = len(palabras_originales) - len(palabras_limpias)
+    
+    # Encontrar símbolos eliminados
+    simbolos_eliminados = set()
+    for palabra in palabras_originales:
+        simbolos = re.findall(r'[^\w\sáéíóúñü]', palabra)
+        simbolos_eliminados.update(simbolos)
+    
+    return render(request, 'procesamiento.html', {
+        'texto': texto_obj,
+        'texto_original': texto_original,
+        'texto_procesado': texto_procesado,
+        'total_palabras_original': len(palabras_originales),
+        'total_palabras_limpias': len(palabras_limpias),
+        'stopwords_eliminadas': stopwords_eliminadas,
+        'simbolos_eliminados': ', '.join(simbolos_eliminados) if simbolos_eliminados else 'Ninguno'
     })

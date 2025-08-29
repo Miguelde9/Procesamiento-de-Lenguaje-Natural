@@ -171,8 +171,9 @@
         {% endif %}
         
         <div class="btn-container">
-            <a href="{% url 'subir_texto' %}" class="btn">📤 Analizar otro texto</a>
-            <a href="{% url 'lista_textos' %}" class="btn btn-secondary">← Volver a la lista</a>
+        <a href="{% url 'subir_texto' %}" class="btn">📤 Analizar otro texto</a>
+        <a href="{% url 'ver_procesamiento' texto.id %}" class="btn btn-success">🔍 Ver Detalles de Procesamiento</a>
+        <a href="{% url 'lista_textos' %}" class="btn btn-secondary">← Volver a la lista</a>
         </div>
     </div>
 </body>

@@ -74,5 +74,18 @@ def procesar_texto(contenido):
     return {
         'palabras_comunes': palabras_comunes,
         'total_palabras': len(palabras_limpias),
-        'palabras_limpias': palabras_limpias  # Para posibles usos futuros
+        'palabras_limpias': palabras_limpias
+    }
+
+def obtener_estadisticas_procesamiento(texto_original, palabras_limpias):
+    """
+    Función para obtener estadísticas detalladas del procesamiento
+    """
+    palabras_originales = texto_original.split()
+    
+    return {
+        'total_palabras_original': len(palabras_originales),
+        'total_palabras_limpias': len(palabras_limpias),
+        'stopwords_eliminadas': len(palabras_originales) - len(palabras_limpias),
+        'texto_procesado': ' '.join(palabras_limpias)
     }
