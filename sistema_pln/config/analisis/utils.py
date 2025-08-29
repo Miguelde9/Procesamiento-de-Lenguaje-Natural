@@ -1,4 +1,8 @@
-STOPWORDS = {
+import re
+from collections import Counter
+
+# Lista de stopwords en español
+STOPWORDS_ES = {
     'de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'del', 'se', 'las', 'por', 'un', 'para', 
     'con', 'no', 'una', 'su', 'al', 'lo', 'como', 'más', 'pero', 'sus', 'le', 'ya', 'o', 
     'este', 'sí', 'porque', 'esta', 'entre', 'cuando', 'muy', 'sin', 'sobre', 'también', 
@@ -36,3 +40,39 @@ STOPWORDS = {
     'tuvieses', 'tuviésemos', 'tuvieseis', 'tuviesen', 'teniendo', 'tenido', 'tenida', 
     'tenidos', 'tenidas', 'tened'
 }
+
+def limpiar_texto(texto):
+    """
+    Función para limpiar el texto:
+    1. Convertir a minúsculas
+    2. Eliminar símbolos de puntuación
+    3. Eliminar stopwords en español
+    """
+    # Convertir a minúsculas
+    texto = texto.lower()
+    
+    # Eliminar símbolos de puntuación y caracteres especiales (manteniendo letras, números y espacios)
+    texto_limpio = re.sub(r'[^\w\sáéíóúñü]', ' ', texto)
+    
+    # Tokenizar y eliminar stopwords y palabras de un solo carácter
+    palabras = texto_limpio.split()
+    palabras_filtradas = [palabra for palabra in palabras if palabra not in STOPWORDS_ES and len(palabra) > 1]
+    
+    return palabras_filtradas
+
+def procesar_texto(contenido):
+    """
+    Función principal para procesar el texto y generar estadísticas
+    """
+    # Limpiar el texto
+    palabras_limpias = limpiar_texto(contenido)
+    
+    # Generar histograma con el texto limpio
+    contador_palabras = Counter(palabras_limpias)
+    palabras_comunes = contador_palabras.most_common(20)  # Top 20 palabras
+    
+    return {
+        'palabras_comunes': palabras_comunes,
+        'total_palabras': len(palabras_limpias),
+        'palabras_limpias': palabras_limpias  # Para posibles usos futuros
+    }

@@ -47,6 +47,13 @@
             font-size: 1.2em;
             opacity: 0.9;
         }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -118,9 +125,13 @@
         <h1>📊 Resultados del análisis</h1>
         <div class="subtitle">{{ texto.titulo }}</div>
         
+        <div class="info-box">
+            <strong>Procesamiento aplicado:</strong> Conversión a minúsculas, eliminación de puntuación y stopwords en español.
+        </div>
+        
         <div class="stats-card">
             <div class="stats-number">{{ total_palabras }}</div>
-            <div class="stats-label">palabras encontradas en total</div>
+            <div class="stats-label">palabras válidas después de la limpieza</div>
         </div>
         
         <h2>📈 Histograma de palabras (Top 20)</h2>
