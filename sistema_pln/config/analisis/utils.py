@@ -1,7 +1,8 @@
 import re
+import unicodedata
 from collections import Counter
 
-# Lista de stopwords en español
+# Lista de stopwords en español (incluyendo versiones acentuadas)
 STOPWORDS_ES = {
     'de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'del', 'se', 'las', 'por', 'un', 'para', 
     'con', 'no', 'una', 'su', 'al', 'lo', 'como', 'más', 'pero', 'sus', 'le', 'ya', 'o', 
@@ -38,8 +39,32 @@ STOPWORDS_ES = {
     'teníamos', 'teníais', 'tenían', 'tuve', 'tuviste', 'tuvo', 'tuvimos', 'tuvisteis', 
     'tuvieron', 'tuviera', 'tuvieras', 'tuviéramos', 'tuvierais', 'tuvieran', 'tuviese', 
     'tuvieses', 'tuviésemos', 'tuvieseis', 'tuviesen', 'teniendo', 'tenido', 'tenida', 
-    'tenidos', 'tenidas', 'tened'
+    'tenidos', 'tenidas', 'tened', 'él', 'ésta', 'éstas', 'éste', 'éstos', 'última', 'últimas', 
+    'último', 'últimos', 'aún', 'dónde', 'cómo', 'cuándo', 'cuánto', 'cuánta', 'cuántos', 
+    'cuántas', 'qué', 'quiénes', 'también', 'además', 'mientras', 'aunque', 'pero', 'sino', 
+    'porque', 'aquel', 'aquella', 'aquellos', 'aquellas', 'ése', 'ésa', 'ésos', 'ésas', 
+    'mío', 'mía', 'míos', 'mías', 'tuyo', 'tuya', 'tuyos', 'tuyas', 'suyo', 'suya', 'suyos', 
+    'suyas', 'nuestro', 'nuestra', 'nuestros', 'nuestras', 'vuestro', 'vuestra', 'vuestros', 
+    'vuestras', 'cuyo', 'cuya', 'cuyos', 'cuyas'
 }
+
+def normalizar_acentos(texto):
+    """
+    Normaliza los caracteres acentuados para mejorar la coincidencia
+    pero preserva las letras ñ y ü que son importantes en español
+    """
+    # Separar la ñ y ü para que no se normalicen
+    texto = texto.replace('ñ', '__n_tilde__').replace('ü', '__u_dieresis__')
+    texto = texto.replace('Ñ', '__N_tilde__').replace('Ü', '__U_dieresis__')
+    
+    # Normalizar acentos (á -> a, é -> e, etc.)
+    texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
+    
+    # Restaurar la ñ y ü
+    texto = texto.replace('__n_tilde__', 'ñ').replace('__u_dieresis__', 'ü')
+    texto = texto.replace('__N_tilde__', 'Ñ').replace('__U_dieresis__', 'Ü')
+    
+    return texto
 
 def limpiar_texto(texto):
     """
@@ -51,12 +76,23 @@ def limpiar_texto(texto):
     # Convertir a minúsculas
     texto = texto.lower()
     
-    # Eliminar símbolos de puntuación y caracteres especiales (manteniendo letras, números y espacios)
-    texto_limpio = re.sub(r'[^\w\sáéíóúñü]', ' ', texto)
+    # Normalizar acentos pero preservar ñ y ü
+    texto = normalizar_acentos(texto)
     
-    # Tokenizar y eliminar stopwords y palabras de un solo carácter
+    # Eliminar símbolos de puntuación y caracteres especiales (manteniendo letras, números, ñ, ü y espacios)
+    texto_limpio = re.sub(r'[^\w\sñü]', ' ', texto)
+    
+    # Tokenizar
     palabras = texto_limpio.split()
-    palabras_filtradas = [palabra for palabra in palabras if palabra not in STOPWORDS_ES and len(palabra) > 1]
+    
+    # Normalizar stopwords para comparación (también sin acentos)
+    stopwords_normalizadas = {normalizar_acentos(palabra) for palabra in STOPWORDS_ES}
+    
+    # Eliminar stopwords y palabras de un solo carácter
+    palabras_filtradas = [
+        palabra for palabra in palabras 
+        if palabra not in stopwords_normalizadas and len(palabra) > 1
+    ]
     
     return palabras_filtradas
 
@@ -76,7 +112,7 @@ def procesar_texto(contenido):
         'total_palabras': len(palabras_limpias),
         'palabras_limpias': palabras_limpias
     }
-
+    
 def obtener_estadisticas_procesamiento(texto_original, palabras_limpias):
     """
     Función para obtener estadísticas detalladas del procesamiento

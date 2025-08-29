@@ -117,6 +117,39 @@
             padding: 2px 4px;
             border-radius: 3px;
         }
+        .palabras-lista {
+            line-height: 1.8;
+            margin: 15px 0;
+        }
+        .help-text {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .acento-demo {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .acento-ejemplo {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+        }
+        .ejemplo-item {
+            text-align: center;
+            padding: 10px;
+        }
+        .ejemplo-original {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .ejemplo-procesado {
+            color: #27ae60;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -168,6 +201,22 @@
             <h2>🔣 Símbolos Eliminados</h2>
             <div class="text-container">
                 <p>Se eliminaron los siguientes símbolos de puntuación: <span class="highlight">{{ simbolos_eliminados }}</span></p>
+            </div>
+        </div>
+        {% endif %}
+       
+        {% if palabras_con_acentos %}
+        <div class="text-section">
+            <h2>🔤 Palabras con Acentos Preservados</h2>
+            <div class="text-container">
+                <p>Se detectaron y preservaron <strong>{{ palabras_con_acentos|length }}</strong> palabras con acentos:</p>
+                <div class="palabras-lista">
+                    {% for palabra in palabras_con_acentos %}
+                    <span class="highlight">{{ palabra }}</span>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if palabras_con_acentos|length > 20 %}...{% endif %}
+                </div>
+                <p class="help-text">El sistema preserva correctamente las letras acentuadas (á, é, í, ó, ú) y caracteres especiales del español (ñ, ü).</p>
             </div>
         </div>
         {% endif %}

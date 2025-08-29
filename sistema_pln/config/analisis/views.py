@@ -61,14 +61,20 @@ def ver_procesamiento(request, texto_id):
     texto_procesado = ' '.join(palabras_limpias)
     
     # Contar estadísticas
-    palabras_originales = texto_original.split()
+    palabras_originales = re.findall(r'\b[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+\b', texto_original.lower())
     stopwords_eliminadas = len(palabras_originales) - len(palabras_limpias)
     
     # Encontrar símbolos eliminados
     simbolos_eliminados = set()
-    for palabra in palabras_originales:
-        simbolos = re.findall(r'[^\w\sáéíóúñü]', palabra)
+    for palabra in texto_original.split():
+        simbolos = re.findall(r'[^\w\sáéíóúñüÁÉÍÓÚÑÜ]', palabra)
         simbolos_eliminados.update(simbolos)
+    
+    # Encontrar palabras con acentos en el texto original
+    palabras_con_acentos = []
+    for palabra in palabras_originales:
+        if re.search(r'[áéíóúÁÉÍÓÚñÑüÜ]', palabra):
+            palabras_con_acentos.append(palabra)
     
     return render(request, 'procesamiento.html', {
         'texto': texto_obj,
@@ -77,5 +83,6 @@ def ver_procesamiento(request, texto_id):
         'total_palabras_original': len(palabras_originales),
         'total_palabras_limpias': len(palabras_limpias),
         'stopwords_eliminadas': stopwords_eliminadas,
-        'simbolos_eliminados': ', '.join(simbolos_eliminados) if simbolos_eliminados else 'Ninguno'
+        'simbolos_eliminados': ', '.join(simbolos_eliminados) if simbolos_eliminados else 'Ninguno',
+        'palabras_con_acentos': palabras_con_acentos[:20]  # Mostrar hasta 20 palabras con acentos
     })
