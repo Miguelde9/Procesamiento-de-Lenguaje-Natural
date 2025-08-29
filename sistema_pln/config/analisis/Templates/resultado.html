@@ -47,13 +47,6 @@
             font-size: 1.2em;
             opacity: 0.9;
         }
-        .info-box {
-            background: #e7f8e6;
-            border-left: 4px solid #27ae60;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -118,14 +111,6 @@
             background: linear-gradient(90deg, #3498db, #2ecc71);
             border-radius: 5px;
         }
-        .palabras-limpias {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body>
@@ -133,13 +118,9 @@
         <h1>📊 Resultados del análisis</h1>
         <div class="subtitle">{{ texto.titulo }}</div>
         
-        <div class="info-box">
-            <strong>✅ Procesamiento completado:</strong> Se han eliminado stopwords, signos de puntuación y convertido a minúsculas.
-        </div>
-        
         <div class="stats-card">
             <div class="stats-number">{{ total_palabras }}</div>
-            <div class="stats-label">palabras significativas encontradas</div>
+            <div class="stats-label">palabras encontradas en total</div>
         </div>
         
         <h2>📈 Histograma de palabras (Top 20)</h2>
@@ -175,13 +156,6 @@
             <div style="font-size: 48px;">📝</div>
             <h3>No se encontraron palabras en el texto</h3>
             <p>El archivo podría estar vacío o en un formato no compatible</p>
-        </div>
-        {% endif %}
-        
-        {% if palabras_limpias %}
-        <div class="palabras-limpias">
-            <h3>🔍 Muestra de palabras después de la limpieza (primeras 50):</h3>
-            <p>{{ palabras_limpias|join:", " }}</p>
         </div>
         {% endif %}
         
