@@ -23,6 +23,12 @@ def lista_textos(request):
 def analizar_texto(request, texto_id):
     texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
     
+    # Obtener el valor de n-grama del parámetro GET (por defecto 1)
+    if 'n_grama' in request.GET:
+        n_grama = int(request.GET.get('n_grama', 1))
+    
+    texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
+    
     # Leer el contenido del archivo
     try:
         with texto_obj.archivo.open('r') as archivo:
@@ -30,8 +36,8 @@ def analizar_texto(request, texto_id):
     except:
         contenido = ""
     
-    # Procesar el texto usando la nueva funcionalidad de limpieza
-    resultado = procesar_texto(contenido)
+    # Procesar el texto usando la nueva funcionalidad que incluye n-gramas
+    resultado = procesar_texto_completo(contenido, n_grama)
     
     # Guardar el contenido original y procesado en la sesión para mostrarlo después
     request.session['texto_original'] = contenido
@@ -40,7 +46,9 @@ def analizar_texto(request, texto_id):
     return render(request, 'resultado.html', {
         'texto': texto_obj,
         'palabras_comunes': resultado['palabras_comunes'],
+        'ngramas_comunes': resultado['ngramas_comunes'],
         'total_palabras': resultado['total_palabras'],
+        'n_grama': resultado['n_grama'],
         'texto_id': texto_id
     })
 

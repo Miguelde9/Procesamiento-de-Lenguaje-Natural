@@ -162,6 +162,55 @@
                 {% endfor %}
             </tbody>
         </table>
+        <!-- resultado.html - Agregar después de la tabla de palabras comunes -->
+
+{% if n_grama > 1 and ngramas_comunes %}
+<div style="margin-top: 40px;">
+    <h2>📊 N-Gramas de tamaño {{ n_grama }} (Top 20)</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th width="10%">#</th>
+                <th width="50%">N-Grama</th>
+                <th width="20%">Frecuencia</th>
+                <th width="20%">Frecuencia relativa</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ngrama, frecuencia in ngramas_comunes %}
+            <tr>
+                <td class="word-rank">{{ forloop.counter }}</td>
+                <td><strong>{{ ngrama }}</strong></td>
+                <td>{{ frecuencia }} ocurrencias</td>
+                <td>
+                    <div>{% widthratio frecuencia total_palabras 100 %}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Agregar un formulario para seleccionar el tamaño de n-grama -->
+<div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <h3>🔧 Configurar N-Gramas</h3>
+    <form method="get" action="{% url 'analizar_texto' texto.id %}">
+        <label for="n_grama">Tamaño de n-grama:</label>
+        <select name="n_grama" id="n_grama" onchange="this.form.submit()">
+            <option value="1" {% if n_grama == 1 %}selected{% endif %}>Palabras individuales</option>
+            <option value="2" {% if n_grama == 2 %}selected{% endif %}>Bigramas (2 palabras)</option>
+            <option value="3" {% if n_grama == 3 %}selected{% endif %}>Trigramas (3 palabras)</option>
+            <option value="4" {% if n_grama == 4 %}selected{% endif %}>4-gramas</option>
+            <option value="5" {% if n_grama == 5 %}selected{% endif %}>5-gramas</option>
+        </select>
+    </form>
+    <p class="help-text">Los n-gramas son secuencias de N palabras consecutivas. Son útiles para analizar patrones de lenguaje.</p>
+</div>
         {% else %}
         <div style="text-align: center; padding: 40px; color: #7f8c8d;">
             <div style="font-size: 48px;">📝</div>

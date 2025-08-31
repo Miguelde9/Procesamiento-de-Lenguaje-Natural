@@ -105,8 +105,12 @@
                     <td><strong>{{ texto.titulo }}</strong></td>
                     <td>{{ texto.fecha_subida|date:"d/m/Y H:i" }}</td>
                     <td>
-                        <a href="{% url 'analizar_texto' texto.id %}" class="btn btn-analizar">📊 Analizar</a>
-                    </td>
+    <a href="{% url 'analizar_texto' texto.id %}" class="btn btn-analizar">📊 Analizar</a>
+    <div style="margin-top: 5px;">
+        <a href="{% url 'analizar_texto' texto.id %}?n_grama=2" style="font-size: 12px; color: #3498db;">Bigramas</a> |
+        <a href="{% url 'analizar_texto' texto.id %}?n_grama=3" style="font-size: 12px; color: #3498db;">Trigramas</a>
+    </div>
+</td>
                 </tr>
                 {% endfor %}
             </tbody>
