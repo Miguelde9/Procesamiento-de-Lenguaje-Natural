@@ -1,10 +1,11 @@
+# views.py - Actualizar las importaciones
 import re
 from collections import Counter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .forms import TextoAnalizadoForm
 from .models import TextoAnalizado
-from .utils import procesar_texto, limpiar_texto  # Importar ambas funciones
+from .utils import procesar_texto_completo, limpiar_texto  # Cambiar a procesar_texto_completo
 
 def subir_texto(request):
     if request.method == 'POST':
@@ -20,12 +21,17 @@ def lista_textos(request):
     textos = TextoAnalizado.objects.all().order_by('-fecha_subida')
     return render(request, 'lista.html', {'textos': textos})
 
-def analizar_texto(request, texto_id):
-    texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
-    
-    # Obtener el valor de n-grama del parámetro GET (por defecto 1)
+def analizar_texto(request, texto_id, n_grama=1):
     if 'n_grama' in request.GET:
-        n_grama = int(request.GET.get('n_grama', 1))
+        try:
+            n_grama = int(request.GET.get('n_grama', 1))
+            # Validar que n_grama esté en un rango razonable
+            if n_grama < 1:
+                n_grama = 1
+            elif n_grama > 10:  # Límite máximo para evitar problemas de rendimiento
+                n_grama = 10
+        except (ValueError, TypeError):
+            n_grama = 1
     
     texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
     
@@ -48,7 +54,7 @@ def analizar_texto(request, texto_id):
         'palabras_comunes': resultado['palabras_comunes'],
         'ngramas_comunes': resultado['ngramas_comunes'],
         'total_palabras': resultado['total_palabras'],
-        'n_grama': resultado['n_grama'],
+        'n_grama': n_grama,  # Asegurar que esta variable se pasa
         'texto_id': texto_id
     })
 

@@ -13,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             padding: 30px;
@@ -57,10 +57,10 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         th, td {
-            padding: 15px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -100,6 +100,12 @@
         .btn-secondary:hover {
             background: #7f8c8d;
         }
+        .btn-success {
+            background: #27ae60;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
         .btn-container {
             text-align: center;
             margin-top: 30px;
@@ -108,15 +114,144 @@
         }
         .progress-bar {
             background: #ecf0f1;
-            height: 10px;
-            border-radius: 5px;
+            height: 8px;
+            border-radius: 4px;
             margin-top: 5px;
+            margin-bottom: 3px;
             overflow: hidden;
         }
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #3498db, #2ecc71);
-            border-radius: 5px;
+            border-radius: 4px;
+        }
+        
+        /* Estilos para el diseño de dos columnas */
+        .results-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .results-column {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .results-column-full {
+            width: 100%;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            height: fit-content;
+        }
+        
+        .table-title {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        /* Estilos para el cuadro de entrada de n-gramas */
+        .ngram-config {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .ngram-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .ngram-input {
+            padding: 8px 12px;
+            width: 80px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .ngram-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .ngram-btn {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .ngram-btn:hover {
+            background: #2980b9;
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            padding: 4px 8px;
+            background: #e0e0e0;
+            color: #333;
+            border-radius: 3px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .quick-link:hover, .quick-link.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .results-container {
+                flex-direction: column;
+            }
+            
+            .results-column {
+                width: 100%;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .ngram-input-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .quick-links {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -133,98 +268,148 @@
             <div class="stats-number">{{ total_palabras }}</div>
             <div class="stats-label">palabras válidas después de la limpieza</div>
         </div>
-        
-        <h2>📈 Histograma de palabras (Top 20)</h2>
-        
-        {% if palabras_comunes %}
-        <table>
-            <thead>
-                <tr>
-                    <th width="10%">#</th>
-                    <th width="40%">Palabra</th>
-                    <th width="25%">Frecuencia</th>
-                    <th width="25%">Frecuencia relativa</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for palabra, frecuencia in palabras_comunes %}
-                <tr>
-                    <td class="word-rank">{{ forloop.counter }}</td>
-                    <td><strong>{{ palabra }}</strong></td>
-                    <td>{{ frecuencia }} ocurrencias</td>
-                    <td>
-                        <div>{% widthratio frecuencia total_palabras 100 %}%</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <!-- resultado.html - Agregar después de la tabla de palabras comunes -->
 
-{% if n_grama > 1 and ngramas_comunes %}
-<div style="margin-top: 40px;">
-    <h2>📊 N-Gramas de tamaño {{ n_grama }} (Top 20)</h2>
-    
-    <table>
-        <thead>
-            <tr>
-                <th width="10%">#</th>
-                <th width="50%">N-Grama</th>
-                <th width="20%">Frecuencia</th>
-                <th width="20%">Frecuencia relativa</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ngrama, frecuencia in ngramas_comunes %}
-            <tr>
-                <td class="word-rank">{{ forloop.counter }}</td>
-                <td><strong>{{ ngrama }}</strong></td>
-                <td>{{ frecuencia }} ocurrencias</td>
-                <td>
-                    <div>{% widthratio frecuencia total_palabras 100 %}%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
+        <!-- CONTENEDOR PRINCIPAL DE RESULTADOS -->
+        <div class="results-container">
+            <!-- COLUMNA IZQUIERDA - PALABRAS INDIVIDUALES -->
+            <div class="results-column">
+                <div class="table-container">
+                    <h2 class="table-title">
+                        {% if n_grama == 1 %}
+                            📈 Histograma de palabras (Top 20)
+                        {% else %}
+                            📈 Palabras individuales (Top 20)
+                        {% endif %}
+                    </h2>
+                    
+                    {% if palabras_comunes %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="15%">#</th>
+                                <th width="45%">Palabra</th>
+                                <th width="40%">Frecuencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for palabra, frecuencia in palabras_comunes %}
+                            <tr>
+                                <td class="word-rank">{{ forloop.counter }}</td>
+                                <td><strong>{{ palabra }}</strong></td>
+                                <td>
+                                    {{ frecuencia }} ocurrencias
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
+                                    </div>
+                                    <small>{% widthratio frecuencia total_palabras 100 %}%</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div style="text-align: center; padding: 20px; color: #7f8c8d;">
+                        <div style="font-size: 32px;">📝</div>
+                        <p>No se encontraron palabras en el texto</p>
                     </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endif %}
+                    {% endif %}
+                </div>
+            </div>
 
-<!-- Agregar un formulario para seleccionar el tamaño de n-grama -->
-<div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-    <h3>🔧 Configurar N-Gramas</h3>
-    <form method="get" action="{% url 'analizar_texto' texto.id %}">
-        <label for="n_grama">Tamaño de n-grama:</label>
-        <select name="n_grama" id="n_grama" onchange="this.form.submit()">
-            <option value="1" {% if n_grama == 1 %}selected{% endif %}>Palabras individuales</option>
-            <option value="2" {% if n_grama == 2 %}selected{% endif %}>Bigramas (2 palabras)</option>
-            <option value="3" {% if n_grama == 3 %}selected{% endif %}>Trigramas (3 palabras)</option>
-            <option value="4" {% if n_grama == 4 %}selected{% endif %}>4-gramas</option>
-            <option value="5" {% if n_grama == 5 %}selected{% endif %}>5-gramas</option>
-        </select>
-    </form>
-    <p class="help-text">Los n-gramas son secuencias de N palabras consecutivas. Son útiles para analizar patrones de lenguaje.</p>
-</div>
-        {% else %}
-        <div style="text-align: center; padding: 40px; color: #7f8c8d;">
-            <div style="font-size: 48px;">📝</div>
-            <h3>No se encontraron palabras en el texto</h3>
-            <p>El archivo podría estar vacío o en un formato no compatible</p>
+            <!-- COLUMNA DERECHA - N-GRAMAS (SOLO CUANDO n_grama > 1) -->
+            {% if n_grama > 1 %}
+            <div class="results-column">
+                <div class="table-container">
+                    <h2 class="table-title">📊 N-Gramas de tamaño {{ n_grama }} (Top 20)</h2>
+                    
+                    {% if ngramas_comunes %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="15%">#</th>
+                                <th width="45%">N-Grama ({{ n_grama }})</th>
+                                <th width="40%">Frecuencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ngrama, frecuencia in ngramas_comunes %}
+                            <tr>
+                                <td class="word-rank">{{ forloop.counter }}</td>
+                                <td><strong>{{ ngrama }}</strong></td>
+                                <td>
+                                    {{ frecuencia }} ocurrencias
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
+                                    </div>
+                                    <small>{% widthratio frecuencia total_palabras 100 %}%</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    <div class="info-box" style="margin-top: 15px;">
+                        <strong>💡 Información:</strong><br>
+                        Total palabras: <strong>{{ total_palabras }}</strong><br>
+                        Posibles {{ n_grama }}-gramas: <strong>{{ total_palabras|add:n_grama|add:"-1" }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="warning-box">
+                        <h4>⚠️ No se pudieron generar n-gramas</h4>
+                        <p>El texto no tiene suficientes palabras para n-gramas de tamaño {{ n_grama }}.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+
+        <!-- FORMULARIO DE CONFIGURACIÓN DE N-GRAMAS -->
+        <div class="ngram-config">
+            <h3>🔧 Configurar N-Gramas</h3>
+            <form method="get" action="{% url 'analizar_texto' texto.id %}">
+                <div class="ngram-input-container">
+                    <label for="n_grama">Tamaño de n-grama:</label>
+                    <input type="number" name="n_grama" id="n_grama" 
+                           value="{{ n_grama }}" min="1" max="10" 
+                           class="ngram-input">
+                    <button type="submit" class="ngram-btn">
+                        Calcular
+                    </button>
+                </div>
+            </form>
+            <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                <strong>Nota:</strong> Cuando n=1, se muestran solo palabras individuales. 
+                Con n>1, se muestran palabras individuales y n-gramas lado a lado.
+            </p>
+            
+            <!-- Enlaces rápidos para n-gramas comunes -->
+            <div class="quick-links">
+                <span style="font-weight: bold;">Accesos rápidos: </span>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=1" 
+                   class="quick-link {% if n_grama == 1 %}active{% endif %}">
+                    Palabras (1)
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=2" 
+                   class="quick-link {% if n_grama == 2 %}active{% endif %}">
+                    Bigramas (2)
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=3" 
+                   class="quick-link {% if n_grama == 3 %}active{% endif %}">
+                    Trigramas (3)
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=4" 
+                   class="quick-link {% if n_grama == 4 %}active{% endif %}">
+                    4-gramas
+                </a>
+            </div>
+        </div>
         
         <div class="btn-container">
-        <a href="{% url 'subir_texto' %}" class="btn">📤 Analizar otro texto</a>
-        <a href="{% url 'ver_procesamiento' texto.id %}" class="btn btn-success">🔍 Ver Detalles de Procesamiento</a>
-        <a href="{% url 'lista_textos' %}" class="btn btn-secondary">← Volver a la lista</a>
+            <a href="{% url 'subir_texto' %}" class="btn">📤 Analizar otro texto</a>
+            <a href="{% url 'ver_procesamiento' texto.id %}" class="btn btn-success">🔍 Ver Detalles de Procesamiento</a>
+            <a href="{% url 'lista_textos' %}" class="btn btn-secondary">← Volver a la lista</a>
         </div>
     </div>
-    
 </body>
 </html>

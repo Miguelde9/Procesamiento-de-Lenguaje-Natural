@@ -137,8 +137,8 @@ def generar_ngramas(tokens, n=2):
     Returns:
         list: Lista de n-gramas
     """
-    if n <= 1:
-        return tokens
+    if n <= 1 or len(tokens) < n:
+        return []
     
     ngramas = []
     for i in range(len(tokens) - n + 1):
@@ -150,31 +150,25 @@ def generar_ngramas(tokens, n=2):
 def procesar_texto_completo(contenido, n_grama=1):
     """
     Función principal para procesar el texto y generar estadísticas incluyendo n-gramas
-    
-    Args:
-        contenido (str): Texto a procesar
-        n_grama (int): Tamaño de n-gramas a calcular (1 para palabras individuales)
-    
-    Returns:
-        dict: Diccionario con resultados del procesamiento
     """
     # Limpiar el texto
     palabras_limpias = limpiar_texto(contenido)
     
-    # Generar histograma con el texto limpio (palabras individuales)
+    # SIEMPRE generar histograma con palabras individuales
     contador_palabras = Counter(palabras_limpias)
     palabras_comunes = contador_palabras.most_common(20)  # Top 20 palabras
     
-    # Generar n-gramas si se solicita (n > 1)
+    # Generar n-gramas solo si se solicita (n > 1) y hay suficientes palabras
     ngramas_comunes = []
-    if n_grama > 1:
+    if n_grama > 1 and len(palabras_limpias) >= n_grama:
         ngramas = generar_ngramas(palabras_limpias, n_grama)
-        contador_ngramas = Counter(ngramas)
-        ngramas_comunes = contador_ngramas.most_common(20)  # Top 20 n-gramas
+        if ngramas:
+            contador_ngramas = Counter(ngramas)
+            ngramas_comunes = contador_ngramas.most_common(20)  # Top 20 n-gramas
     
     return {
-        'palabras_comunes': palabras_comunes,
-        'ngramas_comunes': ngramas_comunes,
+        'palabras_comunes': palabras_comunes,  # SIEMPRE incluido
+        'ngramas_comunes': ngramas_comunes,    # Solo cuando n > 1
         'total_palabras': len(palabras_limpias),
         'palabras_limpias': palabras_limpias,
         'n_grama': n_grama
