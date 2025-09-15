@@ -27,8 +27,8 @@ def analizar_texto(request, texto_id, n_grama=1):
             n_grama = int(request.GET.get('n_grama', 1))
             if n_grama < 1:
                 n_grama = 1
-            elif n_grama > 10:  # Aumentar el límite máximo
-                n_grama = 10
+            elif n_grama > 100:  # Aumentar el límite máximo
+                n_grama = 100
         except (ValueError, TypeError):
             n_grama = 1
     
