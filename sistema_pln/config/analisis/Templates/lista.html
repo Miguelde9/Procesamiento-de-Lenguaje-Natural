@@ -90,6 +90,24 @@
         
         <a href="{% url 'subir_texto' %}" class="btn">📤 Subir nuevo texto</a>
         
+        <div style="text-align: center; margin: 30px 0;">
+    <h2>🚀 Nuevas Funcionalidades de Autocompletado</h2>
+    <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+        <a href="{% url 'autocompletado' %}" 
+           style="padding: 12px 25px; background: #9b59b6; color: white; 
+                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+            🤖 Ir al Autocompletado
+        </a>
+        <a href="{% url 'entrenar_modelo' %}" 
+           style="padding: 12px 25px; background: #e67e22; color: white; 
+                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+            📊 Entrenar Modelo
+        </a>
+    </div>
+    <p style="color: #7f8c8d; font-style: italic;">
+        Prueba el nuevo sistema de predicción de palabras usando n-gramas
+    </p>
+</div>
         {% if textos %}
         <table>
             <thead>
