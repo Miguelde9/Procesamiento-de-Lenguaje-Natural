@@ -323,7 +323,8 @@
                             <tr>
                                 <th width="15%">#</th>
                                 <th width="45%">Palabra</th>
-                                <th width="40%">Frecuencia</th>
+                                <th width="20%">Frecuencia</th>
+                                <th width="20%">Probabilidad</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -331,12 +332,10 @@
                             <tr>
                                 <td class="word-rank">{{ forloop.counter }}</td>
                                 <td><strong>{{ palabra }}</strong></td>
+                                <td>{{ frecuencia }} ocurrencias</td>
                                 <td>
-                                    {{ frecuencia }} ocurrencias
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
-                                    </div>
-                                    <small>{% widthratio frecuencia total_palabras 100 %}%</small>
+                                    {% widthratio frecuencia total_palabras 100 %}%
+                                    <br><small>P(<strong>{{ palabra }}</strong>) = {{ frecuencia }}/{{ total_palabras }}</small>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -351,8 +350,8 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA - N-GRAMAS (SOLO CUANDO n_grama > 1) -->
-            {% if n_grama > 1 %}
+           <!-- COLUMNA DERECHA - N-GRAMAS (SOLO CUANDO n_grama > 1) -->
+            {% if n_grama and n_grama > 1 %}
             <div class="results-column">
                 <div class="table-container">
                     <h2 class="table-title">📊 N-Gramas de tamaño {{ n_grama }} (Top 20)</h2>
@@ -362,8 +361,9 @@
                         <thead>
                             <tr>
                                 <th width="15%">#</th>
-                                <th width="45%">N-Grama ({{ n_grama }})</th>
-                                <th width="40%">Frecuencia</th>
+                                <th width="40%">N-Grama ({{ n_grama }})</th>
+                                <th width="15%">Frecuencia</th>
+                                <th width="30%">Probabilidad Condicional</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -371,12 +371,22 @@
                             <tr>
                                 <td class="word-rank">{{ forloop.counter }}</td>
                                 <td><strong>{{ ngrama }}</strong></td>
+                                <td>{{ frecuencia }} ocurrencias</td>
                                 <td>
-                                    {{ frecuencia }} ocurrencias
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {% widthratio frecuencia total_palabras 100 %}%"></div>
-                                    </div>
-                                    <small>{% widthratio frecuencia total_palabras 100 %}%</small>
+                                    {% if ngramas_probabilidades %}
+                                        {% for ng_key, prob_data in ngramas_probabilidades.items %}
+                                            {% if ng_key == ngrama %}
+                                                {{ prob_data.probabilidad|floatformat:4 }}
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: {% widthratio prob_data.probabilidad 1 100 %}%"></div>
+                                                </div>
+                                                <small>P(<strong>{{ prob_data.palabra_objetivo }}</strong>|<strong>{{ prob_data.contexto }}</strong>) = 
+                                                {{ prob_data.frecuencia_ngrama }}/{{ prob_data.frecuencia_contexto }}</small>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}

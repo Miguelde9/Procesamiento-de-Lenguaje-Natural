@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autocompletado con N-gramas</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        select:focus, input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+        button {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .resultados {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .sugerencia {
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .sugerencia-principal {
+            border-left: 4px solid #27ae60;
+            font-weight: bold;
+        }
+        .probabilidad {
+            float: right;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background: #fadbd8;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #95a5a6;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        .btn-primary {
+            background: #3498db;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .info-box {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .ngram-input {
+            padding: 10px 12px;
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .ngram-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group .ngram-input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Autocompletado con N-gramas</h1>
+        
+        <div class="info-box">
+            <strong>💡 ¿Cómo funciona?</strong><br>
+            Escribe un texto y el sistema te sugerirá la siguiente palabra más probable basándose en el modelo de n-gramas entrenado con el corpus seleccionado.
+        </div>
+        
+        <form id="autocompletadoForm">
+            <div class="form-group">
+                <label for="texto_id">Seleccionar corpus:</label>
+                <select name="texto_id" id="texto_id" required>
+                    <option value="">-- Selecciona un texto --</option>
+                    {% for texto in textos %}
+                    <option value="{{ texto.id }}">{{ texto.titulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+           <div class="form-group">
+                <label for="n_grama">Orden del n-grama (n):</label>
+                <input type="number" name="n_grama" id="n_grama" 
+                    min="2" max="20" value="3" class="ngram-input" required>
+                <small style="color: #7f8c8d;">
+                    Número de palabras en la secuencia (2=bigramas, 3=trigramas, etc.)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="max_sugerencias">Número máximo de sugerencias:</label>
+                <input type="number" name="max_sugerencias" id="max_sugerencias" 
+                    min="1" max="20" value="5" class="ngram-input">
+                <small style="color: #7f8c8d;">
+                    Cantidad de sugerencias a mostrar (máximo 20)
+                </small>
+            </div>
+                        
+            <div class="checkbox-group">
+                <input type="checkbox" name="fronteras" id="fronteras">
+                <label for="fronteras">Incluir fronteras de oración (&lt;s&gt;, &lt;/s&gt;)</label>
+            </div>
+            
+            <div class="form-group">
+                <label for="texto_input">Escribe tu texto:</label>
+                <input type="text" name="texto" id="texto_input" 
+                       placeholder="Ejemplo: 'el perro' o 'la doctora julieta'..." required>
+                <small style="color: #7f8c8d;">Escribe al menos una palabra para obtener sugerencias</small>
+            </div>
+            
+            <button type="submit">🚀 Obtener sugerencias</button>
+        </form>
+        
+        <div id="resultados" class="resultados" style="display: none;">
+            <h3>Sugerencias para: "<span id="contexto"></span>"</h3>
+            <div id="sugerencias-container"></div>
+        </div>
+        
+        <div class="btn-container">
+            <a href="{% url 'entrenar_modelo' %}" class="btn btn-primary">📊 Entrenar y visualizar modelo</a>
+            <a href="{% url 'lista_textos' %}" class="btn">← Volver a la lista</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('autocompletadoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const texto = document.getElementById('texto_input').value;
+            const textoId = document.getElementById('texto_id').value;
+            const nGrama = document.getElementById('n_grama').value;
+            const fronteras = document.getElementById('fronteras').checked;
+            
+            if (!textoId) {
+                alert('Por favor selecciona un corpus');
+                return;
+            }
+            
+            if (!texto.trim()) {
+                alert('Por favor escribe algún texto');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('resultados').style.display = 'block';
+            document.getElementById('sugerencias-container').innerHTML = 
+                '<div class="loading">⏳ Calculando sugerencias...</div>';
+            
+            // Realizar petición AJAX
+            fetch('{% url "obtener_sugerencias" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                texto: texto,
+                texto_id: textoId,
+                n_grama: nGrama,
+                max_sugerencias: document.getElementById('max_sugerencias').value,
+                fronteras: fronteras
+            })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('sugerencias-container').innerHTML = 
+                        `<div class="error">❌ Error: ${data.error}</div>`;
+                    return;
+                }
+                
+                document.getElementById('contexto').textContent = data.contexto;
+                
+                if (data.sugerencias.length === 0) {
+                    document.getElementById('sugerencias-container').innerHTML = 
+                        '<div class="sugerencia">No se encontraron sugerencias para este contexto. Intenta con más texto o un corpus diferente.</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.sugerencias.forEach((sugerencia, index) => {
+                    const esPrincipal = index === 0;
+                    const probPorcentaje = (sugerencia.probabilidad * 100).toFixed(2);
+                    
+                    html += `
+                        <div class="sugerencia ${esPrincipal ? 'sugerencia-principal' : ''}">
+                            <strong>${sugerencia.palabra}</strong>
+                            <span class="probabilidad">${probPorcentaje}% (Freq: ${sugerencia.frecuencia_ngrama}/${sugerencia.frecuencia_contexto})</span>
+                            ${esPrincipal ? '<br><small>✨ Sugerencia principal</small>' : ''}
+                            <br><small style="color: #95a5a6;">N-grama: ${sugerencia.ngrama_completo}</small>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('sugerencias-container').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('sugerencias-container').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            });
+        });
+        
+        // Función para obtener el token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Ejemplo automático al cargar la página (opcional)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Puedes pre-seleccionar el primer texto si hay alguno
+            const select = document.getElementById('texto_id');
+            if (select.options.length > 1) {
+                select.selectedIndex = 1; // Selecciona el primer texto (no la opción vacía)
+            }
+        });
+    </script>
+</body>
+</html>

@@ -90,6 +90,24 @@
         
         <a href="{% url 'subir_texto' %}" class="btn">📤 Subir nuevo texto</a>
         
+        <div style="text-align: center; margin: 30px 0;">
+    <h2>🚀 Nuevas Funcionalidades de Autocompletado</h2>
+    <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+        <a href="{% url 'autocompletado' %}" 
+           style="padding: 12px 25px; background: #9b59b6; color: white; 
+                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+            🤖 Ir al Autocompletado
+        </a>
+        <a href="{% url 'entrenar_modelo' %}" 
+           style="padding: 12px 25px; background: #e67e22; color: white; 
+                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+            📊 Entrenar Modelo
+        </a>
+    </div>
+    <p style="color: #7f8c8d; font-style: italic;">
+        Prueba el nuevo sistema de predicción de palabras usando n-gramas
+    </p>
+</div>
         {% if textos %}
         <table>
             <thead>
@@ -105,30 +123,39 @@
                     <td><strong>{{ texto.titulo }}</strong></td>
                     <td>{{ texto.fecha_subida|date:"d/m/Y H:i" }}</td>
                     <td>
-    <a href="{% url 'analizar_texto' texto.id %}" class="btn btn-analizar">📊 Analizar</a>
-    <div style="margin-top: 5px; display: flex; gap: 5px; flex-wrap: wrap;">
-        <a href="{% url 'analizar_texto' texto.id %}?n_grama=2" 
-           style="font-size: 11px; padding: 2px 6px; background: #e3f2fd; 
-                  border-radius: 3px; text-decoration: none; border: 1px solid #bbdefb;">
-            Bigramas
-        </a>
-        <a href="{% url 'analizar_texto' texto.id %}?n_grama=3" 
-           style="font-size: 11px; padding: 2px 6px; background: #e8f5e9; 
-                  border-radius: 3px; text-decoration: none; border: 1px solid #c8e6c9;">
-            Trigramas
-        </a>
-        <a href="{% url 'analizar_texto' texto.id %}?n_grama=4" 
-           style="font-size: 11px; padding: 2px 6px; background: #fff3e0; 
-                  border-radius: 3px; text-decoration: none; border: 1px solid #ffe0b2;">
-            4-gramas
-        </a>
-        <a href="{% url 'analizar_texto' texto.id %}?n_grama=5" 
-           style="font-size: 11px; padding: 2px 6px; background: #f3e5f5; 
-                  border-radius: 3px; text-decoration: none; border: 1px solid #e1bee7;">
-            5-gramas
-        </a>
-    </div>
-</td>
+        <td>
+            <a href="{% url 'analizar_texto' texto.id %}" class="btn btn-analizar">📊 Analizar</a>
+            
+            <!-- BOTÓN DE COMPARACIÓN MLE CORREGIDO -->
+            <a href="{% url 'comparar_probabilidades' texto.id %}" 
+            style="font-size: 11px; padding: 2px 6px; background: #9b59b6; 
+                    border-radius: 3px; text-decoration: none; border: 1px solid #8e44ad; color: white; margin-top: 3px; display: inline-block;">
+                🔍 Comparar MLE
+            </a>
+            
+            <div style="margin-top: 5px; display: flex; gap: 5px; flex-wrap: wrap;">
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=2" 
+                style="font-size: 11px; padding: 2px 6px; background: #e3f2fd; 
+                        border-radius: 3px; text-decoration: none; border: 1px solid #bbdefb;">
+                    Bigramas
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=3" 
+                style="font-size: 11px; padding: 2px 6px; background: #e8f5e9; 
+                        border-radius: 3px; text-decoration: none; border: 1px solid #c8e6c9;">
+                    Trigramas
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=4" 
+                style="font-size: 11px; padding: 2px 6px; background: #fff3e0; 
+                        border-radius: 3px; text-decoration: none; border: 1px solid #ffe0b2;">
+                    4-gramas
+                </a>
+                <a href="{% url 'analizar_texto' texto.id %}?n_grama=5" 
+                style="font-size: 11px; padding: 2px 6px; background: #f3e5f5; 
+                        border-radius: 3px; text-decoration: none; border: 1px solid #e1bee7;">
+                    5-gramas
+                </a>
+            </div>
+        </td>
                 </tr>
                 {% endfor %}
             </tbody>
