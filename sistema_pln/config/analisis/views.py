@@ -1,7 +1,6 @@
 # views.py - Actualizar las importaciones
 import re
 import json
-import json
 from collections import Counter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
