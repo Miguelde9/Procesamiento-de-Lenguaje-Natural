@@ -1,6 +1,7 @@
 # views.py - Actualizar las importaciones
 import re
 import json
+import json
 from collections import Counter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -110,10 +111,6 @@ def ver_procesamiento(request, texto_id):
         'simbolos_eliminados': ', '.join(simbolos_eliminados) if simbolos_eliminados else 'Ninguno',
         'palabras_con_acentos': palabras_con_acentos[:20]
     })
-
-# ============================================================================
-# NUEVAS VISTAS PARA AUTOCOMPLETADO Y COMPARACIÓN
-# ============================================================================
 
 def autocompletado_view(request):
     """Vista principal para el autocompletado"""
@@ -283,8 +280,8 @@ def vista_comparacion_avanzada(request, texto_id):
             n_grama = int(n_grama_param)
             if n_grama < 2:
                 n_grama = 2
-            elif n_grama > 10:
-                n_grama = 10
+            elif n_grama > 20:
+                n_grama = 20
         except (ValueError, TypeError):
             n_grama = 3
     
@@ -296,8 +293,8 @@ def comparar_probabilidades(request, texto_id, n_grama=3):
     # Validar n_grama
     if n_grama < 2:
         n_grama = 3
-    elif n_grama > 10:
-        n_grama = 10
+    elif n_grama > 20:
+        n_grama = 20
     
     texto_obj = get_object_or_404(TextoAnalizado, id=texto_id)
     
